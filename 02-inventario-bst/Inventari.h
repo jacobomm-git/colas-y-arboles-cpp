@@ -17,6 +17,11 @@ using namespace std;
             Inventari(float iva){this->iva = iva;};
             Inventari(float iva, string file_path);
             Inventari(const Inventari<T>& orig);
+            Inventari<T>& operator=(const Inventari<T>& orig) {
+                T::operator=(orig);
+                iva = orig.iva;
+                return *this;
+            }
             virtual ~Inventari(); 
             void loadFromFile(string file_path);
             void printAll() const;
@@ -24,8 +29,8 @@ using namespace std;
             float priceInTotal() const;
             float priceInTimeInterval(pair<string, string> ival) const;
             float priceInTimeIntervalByProduct(pair<string, string> ival, string pid) const; 
-            int size() const{return this->size();};
-            int height() const{return this->height();}; 
+            int size() const{return T::size();};
+            int height() const{return T::height();}; 
         private:
             float iva;
             /* Metodes auxiliars, definiu-los aquí sota */
@@ -46,7 +51,7 @@ Inventari<T>::Inventari(float iva, string file_path){
 
 //Constructor copia de inventari
 template<class T>
-Inventari<T>::Inventari(const Inventari<T>& orig){
+Inventari<T>::Inventari(const Inventari<T>& orig) : T(orig){
     this->iva = orig.iva;
 }
 
@@ -70,8 +75,8 @@ void Inventari<T>::loadFromFile(string file_path){
         string amount;
         string price;
         getline(file_obj, newline);
-        while(!file_obj.eof()){
-            getline(file_obj, newline);
+        while(getline(file_obj, newline)){
+            if (newline.empty()) continue;
             stringstream str(newline);
 
             getline(str, date, ',');
@@ -91,7 +96,7 @@ void Inventari<T>::loadFromFile(string file_path){
 template<class T>
 void Inventari<T>::printAll() const{
     if(this->empty()){
-        throw new out_of_range("No hi ha res");
+        throw out_of_range("No hi ha res");
     } else {
         printAll_aux(T::root);
     }
@@ -119,7 +124,7 @@ template<class T>
 void Inventari<T>::printAllReverse() const{
 
     if(this->empty()){
-        throw new out_of_range("No hi ha res");
+        throw out_of_range("No hi ha res");
     } else {
         BSTNode<string, FoodPackage>* ultimo = T::root;
         printAllReverse_aux(ultimo);
@@ -151,7 +156,7 @@ BSTNode<string, FoodPackage>* Inventari<T>::printAllReverse_aux(BSTNode<string, 
 template<class T>
 float Inventari<T>::priceInTotal() const{
     if(this->empty()){
-        throw new out_of_range("No hi ha res");
+        throw out_of_range("No hi ha res");
     } else {
         float precio = 0.0;
         BSTNode<string, FoodPackage>* nodoP = this->root;
@@ -189,6 +194,7 @@ float Inventari<T>::priceInTimeInterval(pair<string, string> ival) const{
 //auxiliar de priceintimeinterval
 template<class T>
 void Inventari<T>::priceInTimeInterval_aux(BSTNode<string, FoodPackage>* node, pair<string, string> ival, float &precio) const{
+    if (!node) return;
     if(node->hasLeft()){
         priceInTimeInterval_aux(node->getLeft(), ival, precio);
     }
@@ -209,7 +215,7 @@ template<class T>
 float Inventari<T>::priceInTimeIntervalByProduct(pair<string, string> ival, string pid) const{
     float precio = 0.0f;
     if(this->empty()){
-        throw new out_of_range("no hi ha res");
+        throw out_of_range("no hi ha res");
     } else {
         BSTNode<string, FoodPackage>* node = this->root;
         priceInTimeIntervalByProduct_aux(node, pid, ival, precio);

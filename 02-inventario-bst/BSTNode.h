@@ -4,6 +4,7 @@
 #include<iostream>
 #include<vector>
 #include<list>
+#include<algorithm>
 using namespace std;
 
 template <class K, class V> 
@@ -15,8 +16,8 @@ class BSTNode {
 
 /* Modificadors */
 // Declareu-hi aquí els modificadors (setters) dels atributs que manquen
-        void setRight(BSTNode<K, V>* key){this->right = key; right->setPadre(this);};
-        void setLeft(BSTNode<K, V>* key){this->left = key; left->setPadre(this);};
+        void setRight(BSTNode<K, V>* key){this->right = key; if (right) right->setPadre(this);};
+        void setLeft(BSTNode<K, V>* key){this->left = key; if (left) left->setPadre(this);};
         void setPadre(BSTNode<K, V>* key){this->padre = key;};
 /* Consultors */
         const K& getKey() const{return this->key;};
@@ -58,6 +59,9 @@ BSTNode<K, V>::BSTNode(const K& key){
 template<class K, class V>
 BSTNode<K, V>::BSTNode(const BSTNode<K, V>& orig){
 
+    this->padre = nullptr;
+    this->left = nullptr;
+    this->right = nullptr;
     this->key = orig.key;
     this->values = orig.values;
     if(orig.hasLeft()){
@@ -85,15 +89,9 @@ int BSTNode<K, V>::depth() const{
 template<class K, class V>
 int BSTNode<K, V>::height() const{
         
-        if(this->isExternal()){
-                return 1;
-        } else if(right == nullptr){
-                return height(this->left) + 1;
-        } else if(left == nullptr){
-                return height(this->left) + 1;
-        } else{
-                return max(height(this->left(), height(this->right))) + 1;
-        }
+        const int leftHeight = left ? left->height() : 0;
+        const int rightHeight = right ? right->height() : 0;
+        return 1 + std::max(leftHeight, rightHeight);
 }
 
 template<class K, class V>

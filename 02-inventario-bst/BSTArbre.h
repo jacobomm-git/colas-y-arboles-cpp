@@ -2,6 +2,8 @@
 #ifndef BSTARBRE_H
 #define BSTARBRE_H
 #include "BSTNode.h"
+#include <stdexcept>
+#include <utility>
 using namespace std;
 
 template <class K, class V> 
@@ -10,6 +12,11 @@ class BSTArbre {
         BSTArbre();
         BSTArbre(const BSTArbre<K, V>& orig);
         virtual ~BSTArbre();
+        BSTArbre<K,V>& operator=(BSTArbre<K,V> other) {
+            std::swap(root, other.root);
+            std::swap(_size, other._size);
+            return *this;
+        }
         bool empty() const{return root == nullptr;};
         int size() const;
         int height() const;
@@ -20,16 +27,16 @@ class BSTArbre {
         void printPostorder(const BSTNode<K,V>* n = nullptr) const;
         const list<BSTNode<K, V>*> getLeafNodes() const;
         void printSecondLargestKey() const;
-        void mirrorTree(); 
+ 
     protected:
         BSTNode<K,V>* root;
         BSTNode<K,V>* search(const K& k) const;
     private:
         int _size;
     /* Mètodes auxiliars definiu aquí els que necessiteu */
-        BSTNode<K, V>* search_aux(const K& k, BSTNode<K, V>*& n);
-        void mirrorTree_aux(BSTNode<K, V>* n) const;
-        void leafs_aux(list<BSTNode<K, V>>& l, BSTNode<K, V>* n);
+        BSTNode<K, V>* search_aux(const K& k, BSTNode<K, V>*& n) const;
+
+        void leafs_aux(list<BSTNode<K, V>*>& l, BSTNode<K, V>* n) const;
         BSTNode<K, V>* secondLargetsKey_aux(const BSTNode<K, V>* n) const;
 
 
@@ -45,7 +52,7 @@ BSTArbre<K, V>::BSTArbre(){
 
 template<class K, class V>
 BSTArbre<K, V>::BSTArbre(const BSTArbre<K, V>& orig){
-    this->root = new BSTNode<K, V>(*orig.root);
+    this->root = orig.root ? new BSTNode<K, V>(*orig.root) : nullptr;
     this->_size = orig._size;
 }
 
@@ -63,7 +70,7 @@ BSTNode<K, V>* BSTArbre<K, V>::search(const K& k) const{
 }
 
 template<class K, class V>
-BSTNode<K, V>* BSTArbre<K, V>::search_aux(const K& k, BSTNode<K, V>*& n){
+BSTNode<K, V>* BSTArbre<K, V>::search_aux(const K& k, BSTNode<K, V>*& n) const{
     BSTNode<K, V>* puntero = root;
     bool aux = true;
     while(aux){
@@ -92,23 +99,14 @@ BSTNode<K, V>* BSTArbre<K, V>::search_aux(const K& k, BSTNode<K, V>*& n){
 template<class K, class V>
 int BSTArbre<K, V>::size() const{
     
-    if(empty()){
-        throw new invalid_argument("Arbre buit");
-        return 0;
-    } else {
-        return _size;
-    }
-    
+    return _size;
+
 }
 
 template<class K, class V>
 int BSTArbre<K, V>::height() const{
-    if(empty()){
-        throw new invalid_argument("Arbre buit");
-        return 0;
-    } else {
-        return root->height();
-    }
+    return root ? root->height() : 0;
+
 }
 template<class K, class V>
 BSTNode<K, V>* BSTArbre<K, V>::insert(const K& k, const V& value){
@@ -141,7 +139,7 @@ BSTNode<K, V>* BSTArbre<K, V>::insert(const K& k, const V& value){
 template<class K, class V>
 const list<V>& BSTArbre<K, V>::valuesOf(const K& k) const{
     if(search(k) == nullptr){
-        throw new out_of_range("No existeix aquest element");
+        throw out_of_range("No existeix aquest element");
     } else {
         return search(k)->getValues();
     }
@@ -152,7 +150,7 @@ template<class K, class V>
 void BSTArbre<K,V>::printPreorder(const BSTNode<K,V>* n) const{ // O(n)
     
     if(empty()){
-        throw new out_of_range("Arbre buit");
+        throw out_of_range("Arbre buit");
     }
     if(n == nullptr){
         return printPreorder(root);
@@ -172,7 +170,7 @@ template<class K, class V>
 void BSTArbre<K,V>::printInorder(const BSTNode<K,V>* n) const{
     
     if(empty()){
-        throw new out_of_range("Arbre buit");
+        throw out_of_range("Arbre buit");
     }
     if(n==nullptr){
         
@@ -190,7 +188,7 @@ template<class K, class V>
 void BSTArbre<K,V>::printPostorder(const BSTNode<K,V>* n) const{
     
     if(empty()){
-        throw new out_of_range("Arbre buit");
+        throw out_of_range("Arbre buit");
     }
     if(n == nullptr){
         return printPostorder(root);
@@ -204,18 +202,22 @@ void BSTArbre<K,V>::printPostorder(const BSTNode<K,V>* n) const{
 template<class K, class V>
 void BSTArbre<K, V>::printSecondLargestKey() const{
     if(empty()){
-        throw new out_of_range("Arbre buit");
+        throw out_of_range("Arbre buit");
     }
     cout<<"La segona ,,key,, mes gran es: "<<secondLargetsKey_aux(root)->getKey()<<endl;
 }
 
 template<class K, class V>
 BSTNode<K, V>* BSTArbre<K, V>::secondLargetsKey_aux(const BSTNode<K, V>* n) const{
-    if(n->hasRight() == false){
-        if(n->hasLeft()) return n->getLeft();
-            return n->getPadre();
+    if (!n || _size < 2) throw std::out_of_range("Calen dues claus");
+    while (n->hasRight()) n = n->getRight();
+    if (n->hasLeft()) {
+        auto second = n->getLeft();
+        while (second->hasRight()) second = second->getRight();
+        return second;
     }
-    return secondLargetsKey_aux(n->getRight());
+    return n->getPadre();
+
 }
 
 template<class K, class V>
@@ -226,7 +228,7 @@ const list<BSTNode<K, V>*> BSTArbre<K,V>::getLeafNodes() const{
 }
 
 template<class K, class V>
-void BSTArbre<K, V>::leafs_aux(list<BSTNode<K, V>>& l, BSTNode<K, V>* n){
+void BSTArbre<K, V>::leafs_aux(list<BSTNode<K, V>*>& l, BSTNode<K, V>* n) const{
     if(n == nullptr){
         return;
     }

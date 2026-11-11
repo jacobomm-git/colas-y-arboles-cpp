@@ -13,7 +13,7 @@ class FoodPackage{
         int getAmount() const{return this->amount;};
         float getPrice() const{return this->price;};
 
-        void setData(string date){this->date_time = date_time;};
+        void setData(string date){this->date_time = date;};
         void setID(string product_id){this->product_id = product_id;};
         void setAmount(int amount){this->amount = amount;};
         void setPrice(float price){this->price = price;};

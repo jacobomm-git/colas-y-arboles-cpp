@@ -18,11 +18,11 @@ int show_menu(vector<string> menu){
         cout<< i+1 << ". " << menu[i] << endl;
     }
         
-    cin>>options;
+    if (!(cin >> options)) return 8;
 
     while(options < 1 || menu.size() < options){
         cout<< options << " Es una opcio incorrecte, escull una opcio entre 1 i " << menu.size() << endl;
-        cin>>options;
+        if (!(cin >> options)) return 8;
     }
     return options;
 }
@@ -36,8 +36,8 @@ void queries(Inventari<BSTArbre<string, FoodPackage>>& inventario){
     file_obj.open(file_path, ios::in);
     if(file_obj.is_open()){
         string date;
-        while(!file_obj.eof()){
-            getline(file_obj, newline);
+        while(getline(file_obj, newline)){
+            if (newline.empty()) continue;
             stringstream str(newline);
             getline(str, date, ',');
             pair<string, string> queries;
