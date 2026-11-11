@@ -3,6 +3,8 @@
 #include "Node.h"
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
+#include <utility>
 using namespace std; 
 
 template<class T>
@@ -11,13 +13,16 @@ class CuaEncadenada{
         CuaEncadenada();
         CuaEncadenada(const CuaEncadenada<T>& q);
         ~CuaEncadenada();
+        CuaEncadenada<T>& operator=(CuaEncadenada<T> other) {
+            std::swap(_front, other._front);
+            std::swap(_rear, other._rear);
+            return *this;
+        }
         bool isEmpty();
         void print();
         void enqueue(const T key);
         void dequeue();
         const T getFront();
-        string toString() const;
-        string operador();
 
     private:
         Node<T>* _front; 
@@ -37,22 +42,22 @@ CuaEncadenada<T>::CuaEncadenada(const CuaEncadenada<T>& q){
     Node<T> *sent2 = new Node<T>();
     _front = sent2;
     _rear = sent2;
-    while(q != nullptr){
-        _front->enqueue(q->getElement());
-        q = q->getNext();
+    for (Node<T>* node = q._front->getNext(); node != nullptr; node = node->getNext()){
+        enqueue(node->getElement());
     }
 }
 
 template<class T>
 CuaEncadenada<T>::~CuaEncadenada(){
-    while(_front->getNext()!= nullptr){
+    while(!isEmpty()){
         dequeue();
     }
+    delete _front;
 }
 
 template<class T>
 bool CuaEncadenada<T>::isEmpty(){
-    if(_rear == nullptr){
+    if(_front == _rear){
         return true;
     } else {
         return false;

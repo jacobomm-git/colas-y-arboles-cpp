@@ -25,19 +25,27 @@ int show_menu(vector<string> menu){
         cout<< i+1 << ". " << menu[i] << endl;
     }
         
-    cin>>options;
+    if (!(cin >> options)) return 5;
 
     while(options < 1 || menu.size() < options){
         cout<< options << " Es una opcio incorrecte, escull una opcio entre 1 i " << menu.size() << endl;
-        cin>>options;
+        if (!(cin >> options)) return 5;
     }
     return options;
 }
 
 void menu_fichero(CuaEncadenada<Comanda> *cua, ifstream &fichero){
 
-    while(!fichero.eof()){
-        getline(fichero, newline, '\n');
+    if (!fichero.is_open()) {
+        fichero.clear();
+        fichero.open("fichero.txt");
+    }
+    if (!fichero) {
+        cerr << "No es pot obrir fichero.txt" << endl;
+        return;
+    }
+    while(getline(fichero, newline)){
+        if (newline.empty()) continue;
         stringstream str(newline);
         
         getline(str, id, ',');
@@ -88,7 +96,7 @@ int main(){
                 } catch(out_of_range error){cout <<"La cola esta vacia"<<endl;};
                 break;
             case 3:
-                cout<<"Inserita n entrades de comandes: "<<cua->getFront()<<endl;
+                cout<<"Inserita n entrades de comandes: "<<endl;
                 cin>>key;
                 for(int i = key; i>0;i--){
                    pedido(cua);
