@@ -1,0 +1,19 @@
+name: Verificacion
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Compilar i comprovar les estructures
+        run: |
+          mkdir -p build
+          g++ -std=c++17 -Wall -Wextra tests/test_estructuras.cpp -o build/test_estructuras
+          ./build/test_estructuras tests/inventario.csv
+          g++ -std=c++17 01-cola-pedidos/main.cpp 01-cola-pedidos/Comanda.cpp -o build/pedidos
+          g++ -std=c++17 02-inventario-bst/main.cpp -o build/inventario
