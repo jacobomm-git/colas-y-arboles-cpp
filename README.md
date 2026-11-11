@@ -1,4 +1,4 @@
-# Estructures de dades en C++
+# C++ · Cues de comandes i inventari amb arbres BST
 
 Dos exercicis seleccionats: una cua enl·laçada aplicada a comandes i un inventari indexat per data amb un arbre binari de cerca. El repositori inclou el codi, dades petites d'exemple i comprovacions dels casos principals.
 
